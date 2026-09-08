@@ -1,4 +1,4 @@
-const db = require('../config/db');
+import db from '../config/db.js'
 
 class User {
   // Method to fetch all users from MySQL

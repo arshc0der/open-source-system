@@ -1,4 +1,4 @@
-import {mysql2} from mysql;
+import mysql from 'mysql2';
 // Create a pool instead of a single connection
 const pool = mysql.createPool({
   host: 'localhost',

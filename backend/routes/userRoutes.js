@@ -1,6 +1,6 @@
 import express from "express"
+import userController from "../controllers/userController.js"
 const router = express.Router();
-const userController = require('../controllers/userController');
 
 // Define HTTP methods and match them to controller functions
 router.get('/users', userController.getUsers);
