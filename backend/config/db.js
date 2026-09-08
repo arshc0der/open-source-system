@@ -1,20 +1,13 @@
-import mysql from 'mysql2';
-// Create a pool instead of a single connection
-const pool = mysql.createPool({
+import mysql from 'mysql2/promise';
+
+const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: 'your_password',
   database: 'my_database',
   waitForConnections: true,
-  connectionLimit: 10, // Max simultaneous connections allowed
+  connectionLimit: 10,
   queueLimit: 0
 });
 
-// Querying using a pool directly handles opening/closing connections automatically
-pool.query('SELECT * FROM users', (err, results, fields) => {
-  if (err) {
-    console.error(err);
-    return;
-  }
-  console.log(results); // Array of user rows
-});
+export default db;
