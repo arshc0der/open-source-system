@@ -1,12 +1,16 @@
 import express from "express"
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
 const port = 4000;
 
-app.get('/',(req,res)=>{
-    res.send("HELLO FORM SERVER");
-})
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+// Mount your routes
+app.use('/api', userRoutes); // Endpoints will be /api/users and /api/users/:id
+
 
 app.listen(port,(req,res)=>{
     console.log(`server running on port ${port}`);
