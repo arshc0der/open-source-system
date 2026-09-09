@@ -1,5 +1,6 @@
 import express from "express";
 import userRoutes from "./routes/userRoutes.js";
+import { testConnection } from "./config/db.js";
 
 const app = express();
 
@@ -14,4 +15,5 @@ app.use("/api", userRoutes);
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+  testConnection();
 });
