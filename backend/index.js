@@ -1,17 +1,17 @@
-import express from "express"
-import userRoutes from "./routes/userRoutes.js"
+import express from "express";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express();
 
 const port = 4000;
 
-// Middleware to parse JSON bodies
+// Middleware
 app.use(express.json());
 
-// Mount your routes
-app.use('/api', userRoutes); // Endpoints will be /api/users and /api/users/:id
+// Routes
+app.use("/api", userRoutes);
 
-
-app.listen(port,(req,res)=>{
-    console.log(`server running on port ${port}`);
-})
+// Start server
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});

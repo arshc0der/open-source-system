@@ -1,9 +1,12 @@
-import express from "express"
-import userController from "../controllers/userController.js"
+import express from "express";
+import { getUsers, getUserById } from "../controllers/userController.js";
+
 const router = express.Router();
 
-// Define HTTP methods and match them to controller functions
-router.get('/users', userController.getUsers);
-router.get('/users/:id', userController.getUserById);
+// GET /api/users
+router.get("/users", getUsers);
 
-module.exports = router;
+// GET /api/users/:id
+router.get("/users/:id", getUserById);
+
+export default router;
