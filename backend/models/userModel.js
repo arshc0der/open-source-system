@@ -75,6 +75,11 @@ class User {
     }
   }
 
+  // Method to find user by email
+  static async getByEmail(email){
+    const [rows] = await db.query('SELECT * FROM users WHERE email = ?',[email]);
+    return rows;
+  }
   // Method to fetch all users from MySQL
   static async getAll() {
     const [rows] = await db.query('SELECT * FROM users');

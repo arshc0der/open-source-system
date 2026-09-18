@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import {loginUser} from '../service/authService.js';
 
 //register user
 const registerUser = async(req,res)=>{
@@ -12,6 +13,20 @@ const registerUser = async(req,res)=>{
     })
   }
 }
+
+//login user
+const getUserLogin = async(req,res)=>{
+  try{
+    const [email, password] = req.body;
+    console.log(`email : ${email} | password : ${password}`);
+    loginUser(email, password);
+  }catch(error){
+    res.status(500).json({
+      message: "Service Error",
+      error: error.message,
+    });
+  }
+};
 // Get all users
 const getUsers = async (req, res) => {
   try {
@@ -46,4 +61,4 @@ const getUserById = async (req, res) => {
   }
 };
 
-export { registerUser, getUsers, getUserById };
+export { registerUser, getUsers, getUserById, getUserLogin};
