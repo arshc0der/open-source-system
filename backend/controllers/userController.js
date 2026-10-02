@@ -18,8 +18,12 @@ const registerUser = async(req,res)=>{
 const getUserLogin = async(req,res)=>{
   try{
     const [email, password] = req.body;
+    console.log(req.body);
     console.log(`email : ${email} | password : ${password}`);
     loginUser(email, password);
+    res.status(200).json({
+      message: "success"
+    });
   }catch(error){
     res.status(500).json({
       message: "Service Error",

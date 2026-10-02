@@ -16,4 +16,4 @@ const loginUser= async (email,password)=>{
     console.log(user);
 }
 
-module.exports = {loginUser};
+export {loginUser};
