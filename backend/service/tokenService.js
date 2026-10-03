@@ -1,53 +1,22 @@
-import { jwt } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
 
-const genrateAccessToken = (userId) => {
-    try {
-        return jwt.sign(
-            { userId },
-            process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "15m" }
-        );
-    } catch (error) {
-        console.log(`${error} | ${new Date()}`);
-    }
+export const generateAccessToken = (userId) => {
+  return jwt.sign({ userId }, env.accessTokenSecret, {
+    expiresIn: env.accessTokenTtl,
+  });
 };
 
-const genrateRefreshToken = (userId) => {
-    try {
-        return jwt.sign(
-            { userId },
-            process.env.REFRESH_TOKEN_SECRET,
-            { expiresIn: "7d" }
-        );
-    } catch (error) {
-        console.log(`${error} | ${new Date()}`);
-    }
+export const generateRefreshToken = (userId) => {
+  return jwt.sign({ userId }, env.refreshTokenSecret, {
+    expiresIn: `${env.sessionDays}d`,
+  });
 };
 
-const verifyAccessToken = (token) => {
-    try {
-        return jwt.verify(
-            token,
-            process.env.ACCESS_TOKEN_SECRET
-        );
-    } catch (error) {
-        console.log(`${error} | ${new Date()}`);
-    }
+export const verifyAccessToken = (token) => {
+  return jwt.verify(token, env.accessTokenSecret);
 };
 
-const verifyRefreshToken = (token) => {
-    try {
-        return jwt.verify(
-            token,
-            process.env.REFRESH_TOKEN_SECRET
-        );
-    } catch (error) {
-        console.log(`${error} | ${new Date()}`);
-    }
-};
-module.exports = {
-    genrateAccessToken,
-    genrateRefreshToken,
-    verifyAccessToken,
-    verifyRefreshToken
+export const verifyRefreshToken = (token) => {
+  return jwt.verify(token, env.refreshTokenSecret);
 };

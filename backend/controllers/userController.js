@@ -1,68 +1,70 @@
 import User from "../models/userModel.js";
-import {loginUser} from '../service/authService.js';
+import Follow from "../models/followModel.js";
+import Repository from "../models/repositoryModel.js";
+import {
+  registerUser as registerAccount,
+  loginUser,
+  logoutUser,
+  publicUser,
+} from "../service/authService.js";
+import { asyncHandler } from "../middleware/errorHandler.js";
 
-//register user
-const registerUser = async(req,res)=>{
-  try{
-    const users = await User.register(req.body);
-    res.status(200).json({users});
-  }catch(error){
-    res.status(500).json({
-      message: "server error",
-      error: error.message
-    })
+export const registerUser = asyncHandler(async (req, res) => {
+  const result = await registerAccount(req.body);
+  res.status(201).json(result);
+});
+
+export const getUserLogin = asyncHandler(async (req, res) => {
+  const { email, password, username } = req.body;
+  let loginEmail = email;
+  if (!loginEmail && username) {
+    const found = await User.getByUsername(username);
+    loginEmail = found?.email;
   }
-}
+  const result = await loginUser(loginEmail, password);
+  res.status(200).json(result);
+});
 
-//login user
-const getUserLogin = async(req,res)=>{
-  try{
-    const [email, password] = req.body;
-    console.log(req.body);
-    console.log(`email : ${email} | password : ${password}`);
-    loginUser(email, password);
-    res.status(200).json({
-      message: "success"
-    });
-  }catch(error){
-    res.status(500).json({
-      message: "Service Error",
-      error: error.message,
-    });
-  }
-};
-// Get all users
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.getAll();
+export const logout = asyncHandler(async (req, res) => {
+  await logoutUser(req.body.sessionToken);
+  res.status(200).json({ message: "logged out" });
+});
 
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({
-      message: "Server Error",
-      error: error.message,
-    });
-  }
-};
+export const getMe = asyncHandler(async (req, res) => {
+  const counts = await User.followerCounts(req.user.id);
+  const repos = await Repository.listByOwnerUser(req.user.id);
+  res.status(200).json({ user: req.user, ...counts, repositories: repos });
+});
 
-// Get user by ID
-const getUserById = async (req, res) => {
-  try {
-    const user = await User.getById(req.params.id);
+export const updateMe = asyncHandler(async (req, res) => {
+  const updated = await User.updateProfile(req.user.id, req.body);
+  res.status(200).json(publicUser(updated));
+});
 
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
+export const getUsers = asyncHandler(async (req, res) => {
+  const users = await User.getAll();
+  res.status(200).json(users);
+});
 
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({
-      message: "Server Error",
-      error: error.message,
-    });
-  }
-};
+export const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.getById(req.params.id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+  const counts = await User.followerCounts(user.id);
+  const repos = await Repository.listByOwnerUser(user.id);
+  res.status(200).json({ ...publicUser(user), ...counts, repositories: repos });
+});
 
-export { registerUser, getUsers, getUserById, getUserLogin};
+export const getUserByUsername = asyncHandler(async (req, res) => {
+  const user = await User.getByUsername(req.params.username);
+  if (!user) return res.status(404).json({ message: "User not found" });
+  const counts = await User.followerCounts(user.id);
+  const repos = await Repository.listByOwnerUser(user.id);
+  res.status(200).json({ ...publicUser(user), ...counts, repositories: repos });
+});
+
+export const followUser = asyncHandler(async (req, res) => {
+  const target = await User.getById(req.params.id);
+  if (!target) return res.status(404).json({ message: "User not found" });
+  const result = await Follow.toggle(req.user.id, target.id);
+  res.status(200).json(result);
+});

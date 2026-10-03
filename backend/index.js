@@ -1,19 +1,37 @@
 import express from "express";
 import userRoutes from "./routes/userRoutes.js";
+import repositoryRoutes from "./routes/repositoryRoutes.js";
+import organizationRoutes from "./routes/organizationRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 import { testConnection } from "./config/db.js";
+import { env } from "./config/env.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
-const port = 4000;
-
-// Middleware
 app.use(express.json());
 
-// Routes
-app.use("/api", userRoutes);
+// CORS without an extra package so the Vite client can call this API directly.
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", env.clientOrigin);
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 
-// Start server
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true });
+});
+
+app.use("/api", userRoutes);
+app.use("/api/repos", repositoryRoutes);
+app.use("/api/organizations", organizationRoutes);
+app.use("/api/notifications", notificationRoutes);
+
+app.use(errorHandler);
+
+app.listen(env.port, () => {
+  console.log(`Server running on port ${env.port}`);
   testConnection();
 });
