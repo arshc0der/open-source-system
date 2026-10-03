@@ -137,8 +137,12 @@ CREATE TABLE IF NOT EXISTS repositories (
   language VARCHAR(80),
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (owner_user_id) REFERENCES users(id) ON DELETE SET NULL,
-  FOREIGN KEY (owner_organization_id) REFERENCES organizations(id) ON DELETE SET NULL,
+  FOREIGN KEY (owner_user_id)
+  REFERENCES users(id)
+  ON DELETE RESTRICT,
+FOREIGN KEY (owner_organization_id)
+  REFERENCES organizations(id)
+  ON DELETE RESTRICT,
   FOREIGN KEY (parent_repository_id) REFERENCES repositories(id) ON DELETE SET NULL,
   CONSTRAINT chk_repo_owner CHECK (
     (owner_user_id IS NOT NULL AND owner_organization_id IS NULL)
