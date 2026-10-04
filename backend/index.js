@@ -1,4 +1,5 @@
 import express from "express";
+import path from "node:path";
 import userRoutes from "./routes/userRoutes.js";
 import repositoryRoutes from "./routes/repositoryRoutes.js";
 import organizationRoutes from "./routes/organizationRoutes.js";
@@ -9,7 +10,8 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
+app.use("/uploads", express.static(path.resolve(process.cwd(), "uploads")));
 
 // CORS without an extra package so the Vite client can call this API directly.
 app.use((req, res, next) => {

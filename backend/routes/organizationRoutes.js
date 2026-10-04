@@ -5,6 +5,8 @@ import {
   getOrganization,
   addOrganizationMember,
   createTeam,
+  addTeamMember,
+  removeTeamMember,
 } from "../controllers/organizationController.js";
 import { requireAuth } from "../middleware/auth.js";
 
@@ -15,5 +17,7 @@ router.post("/", requireAuth, createOrganization);
 router.get("/:id", getOrganization);
 router.post("/:id/members", requireAuth, addOrganizationMember);
 router.post("/:id/teams", requireAuth, createTeam);
+router.post("/:id/teams/:teamId/members", requireAuth, addTeamMember);
+router.delete("/:id/teams/:teamId/members/:userId", requireAuth, removeTeamMember);
 
 export default router;

@@ -8,9 +8,11 @@ import {
   getUserByUsername,
   getMe,
   updateMe,
+  deleteMe,
   followUser,
+  uploadAvatar,
 } from "../controllers/userController.js";
-import { requireAuth } from "../middleware/auth.js";
+import { requireAuth, optionalAuth } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -22,10 +24,12 @@ router.post("/users", registerUser);
 
 router.get("/me", requireAuth, getMe);
 router.patch("/me", requireAuth, updateMe);
+router.put("/me/avatar", requireAuth, express.raw({ type: "image/*", limit: "5mb" }), uploadAvatar);
+router.delete("/me", requireAuth, deleteMe);
 
 router.get("/users", getUsers);
-router.get("/users/:id", getUserById);
-router.get("/profile/:username", getUserByUsername);
+router.get("/users/:id", optionalAuth, getUserById);
+router.get("/profile/:username", optionalAuth, getUserByUsername);
 router.post("/users/:id/follow", requireAuth, followUser);
 
 export default router;

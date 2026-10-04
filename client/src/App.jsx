@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Navbar from "./Component/Navbar.jsx";
+import Footer from "./Component/Footer.jsx";
 import Home from "./Pages/Home.jsx";
 import Login from "./Pages/Login.jsx";
 import Register from "./Pages/Register.jsx";
@@ -9,6 +10,8 @@ import Repositories from "./Pages/Repositories.jsx";
 import RepoDetail from "./Pages/RepoDetail.jsx";
 import NewRepo from "./Pages/NewRepo.jsx";
 import Notifications from "./Pages/Notifications.jsx";
+import Profile from "./Pages/Profile.jsx";
+import Organizations from "./Pages/Organizations.jsx";
 import { clearSession, getStoredUser } from "./api.js";
 
 export default function App() {
@@ -30,21 +33,24 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-black text-neutral-200 font-sans overflow-x-hidden selection:bg-white selection:text-black">
-        <div className="fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/10 via-black to-black pointer-events-none" />
+      <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#0d1117] text-[#e6edf3] selection:bg-[#1f6feb] selection:text-white">
         <Navbar user={user} onLogout={logout} />
-        <main className="relative z-10 flex-grow min-h-[calc(100vh-64px)] pb-20">
+        <main className="min-h-[calc(100vh-128px)] flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login onAuth={setUser} />} />
             <Route path="/register" element={<Register onAuth={setUser} />} />
             <Route path="/explore" element={<Repositories />} />
+            <Route path="/organizations" element={user ? <Organizations user={user} /> : <Navigate to="/login" />} />
+            <Route path="/organizations/:id" element={user ? <Organizations user={user} /> : <Navigate to="/login" />} />
             <Route path="/repos/:owner/:name" element={<RepoDetail user={user} />} />
             <Route path="/dashboard" element={user ? <Dashboard user={user} /> : <Navigate to="/login" />} />
+            <Route path="/profile/:username" element={<Profile user={user} />} />
             <Route path="/new" element={user ? <NewRepo /> : <Navigate to="/login" />} />
             <Route path="/notifications" element={user ? <Notifications /> : <Navigate to="/login" />} />
           </Routes>
         </main>
+        <Footer />
       </div>
     </BrowserRouter>
   );

@@ -1,70 +1,55 @@
+import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { FiBell, FiLogOut, FiUser } from "./icons.js";
+import { FiBell, FiBox, FiLogOut, FiMenu, FiPlus, FiX } from "./icons.js";
+
+const navClass = ({ isActive }) => `inline-flex h-10 items-center border-b-2 px-1 text-sm ${isActive ? "border-[#f78166] font-semibold text-white" : "border-transparent text-[#c9d1d9] hover:text-white"}`;
 
 export default function Navbar({ user, onLogout }) {
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
 
   return (
-    <nav className="relative z-10 border-b border-neutral-800 bg-black/90 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="relative z-10 text-white group-hover:text-blue-400 transition-colors">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2L21 5.5a2.12 2.12 0 0 0-3-3L4.5 16.5z"></path>
-                <path d="M12 15l3 3"></path>
-                <path d="M6.7 17.3L5 22l4.7-1.7"></path>
-                <path d="M9 12l3 3"></path>
-              </svg>
-            </div>
-            <span className="text-xl font-bold tracking-[0.2em] text-white">OSS</span>
-          </Link>
+    <header className="sticky top-0 z-40 border-b border-[#30363d] bg-[#010409]/95 text-[#e6edf3] backdrop-blur">
+      <nav aria-label="Main navigation" className="mx-auto flex min-h-16 max-w-[1600px] items-center gap-4 px-4 sm:px-6">
+        <button type="button" className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-[#3d444d] text-[#c9d1d9] hover:bg-[#212830] md:hidden" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
+          {menuOpen ? <FiX /> : <FiMenu />}
+        </button>
+        <Link to="/" onClick={closeMenu} aria-label="Open Source System home" className="flex shrink-0 items-center gap-2 font-semibold text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#6e7681] bg-[#161b22]"><FiBox className="text-xl" /></span>
+          <span className="hidden text-sm sm:inline">Open Source System</span>
+          <span className="text-sm sm:hidden">OSS</span>
+        </Link>
 
-          <div className="hidden md:flex items-baseline space-x-8 text-xs font-bold tracking-widest uppercase">
-            <NavLink to="/" className={({ isActive }) => `${isActive ? "text-white border-white" : "text-neutral-400 border-transparent"} pb-1 border-b-2 hover:text-white hover:border-white transition-all`}>
-              Home
-            </NavLink>
-            <NavLink to="/explore" className={({ isActive }) => `${isActive ? "text-white border-white" : "text-neutral-400 border-transparent"} pb-1 border-b-2 hover:text-white hover:border-white transition-all`}>
-              Explore
-            </NavLink>
-            {user && (
-              <NavLink to="/dashboard" className={({ isActive }) => `${isActive ? "text-white border-white" : "text-neutral-400 border-transparent"} pb-1 border-b-2 hover:text-white hover:border-white transition-all`}>
-                Dashboard
-              </NavLink>
-            )}
-          </div>
-
-          <div className="flex gap-4 items-center">
-            {!user ? (
-              <>
-                <Link to="/login" className="text-neutral-300 hover:text-white px-4 py-2 text-xs font-bold uppercase tracking-widest">
-                  Login
-                </Link>
-                <Link to="/register" className="bg-white text-black hover:bg-neutral-200 px-5 py-2 rounded-sm text-xs font-bold uppercase tracking-widest">
-                  Register
-                </Link>
-              </>
-            ) : (
-              <div className="flex items-center gap-5">
-                <button onClick={() => navigate("/notifications")} className="text-neutral-400 hover:text-white">
-                  <FiBell className="w-4 h-4" />
-                </button>
-                <button onClick={() => navigate("/new")} className="text-neutral-400 hover:text-white text-xs uppercase tracking-widest border border-neutral-700 px-2 py-1">
-                  + New
-                </button>
-                <button onClick={() => navigate("/dashboard")} className="flex items-center gap-2 group">
-                  <div className="w-8 h-8 rounded-sm bg-neutral-800 border border-neutral-600 flex items-center justify-center group-hover:border-white">
-                    <FiUser className="text-white w-4 h-4" />
-                  </div>
-                </button>
-                <button onClick={onLogout} className="text-neutral-500 hover:text-white">
-                  <FiLogOut className="w-4 h-4" />
-                </button>
-              </div>
-            )}
-          </div>
+        <div className="hidden min-w-0 flex-1 items-center gap-4 md:flex">
+          <NavLink to="/explore" className={navClass}>Explore</NavLink>
+          {user && <>
+            <NavLink to="/dashboard" className={navClass}>Dashboard</NavLink>
+            <NavLink to="/organizations" className={navClass}>Organizations</NavLink>
+            <NavLink to={`/profile/${user.username}`} className={navClass}>Profile</NavLink>
+          </>}
         </div>
-      </div>
-    </nav>
+
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          {user ? <>
+            <button type="button" onClick={() => navigate("/new")} title="Create a new repository" aria-label="Create a new repository" className="inline-flex h-9 items-center gap-2 rounded-md border border-[#3d444d] px-2.5 text-sm text-[#c9d1d9] hover:bg-[#212830]"><FiPlus /><span className="hidden sm:inline">New</span></button>
+            <button type="button" onClick={() => navigate("/notifications")} title="Notifications" aria-label="Notifications" className="relative inline-flex h-9 w-9 items-center justify-center rounded-md text-[#c9d1d9] hover:bg-[#212830]"><FiBell /><span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[#f78166]" /></button>
+            <button type="button" onClick={() => navigate("/dashboard")} title={`Signed in as ${user.username}`} aria-label="Open your dashboard" className="flex h-9 w-9 items-center justify-center rounded-full border border-[#3d444d] bg-[#212830] text-sm font-semibold text-white hover:border-[#8b949e]">{(user.display_name || user.username || "U").charAt(0).toUpperCase()}</button>
+            <button type="button" onClick={onLogout} title="Sign out" aria-label="Sign out" className="inline-flex h-9 w-9 items-center justify-center rounded-md text-[#848d97] hover:bg-[#212830] hover:text-white"><FiLogOut /></button>
+          </> : <>
+            <Link to="/login" className="rounded-md px-3 py-2 text-sm text-[#c9d1d9] hover:text-white">Sign in</Link>
+            <Link to="/register" className="rounded-md border border-[#3d444d] px-3 py-2 text-sm font-medium text-white hover:border-[#8b949e]">Sign up</Link>
+          </>}
+        </div>
+      </nav>
+      {menuOpen && <div className="border-t border-[#30363d] bg-[#0d1117] px-4 py-2 md:hidden">
+        <NavLink to="/explore" onClick={closeMenu} className="block rounded-md px-3 py-2 text-sm text-[#c9d1d9] hover:bg-[#161b22]">Explore</NavLink>
+        {user && <>
+          <NavLink to="/dashboard" onClick={closeMenu} className="block rounded-md px-3 py-2 text-sm text-[#c9d1d9] hover:bg-[#161b22]">Dashboard</NavLink>
+          <NavLink to="/organizations" onClick={closeMenu} className="block rounded-md px-3 py-2 text-sm text-[#c9d1d9] hover:bg-[#161b22]">Organizations</NavLink>
+          <NavLink to={`/profile/${user.username}`} onClick={closeMenu} className="block rounded-md px-3 py-2 text-sm text-[#c9d1d9] hover:bg-[#161b22]">Profile</NavLink>
+        </>}
+      </div>}
+    </header>
   );
 }

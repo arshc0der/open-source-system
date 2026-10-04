@@ -79,8 +79,52 @@ class Organization {
   }
 
   static async listTeams(orgId) {
-    const [rows] = await db.query("SELECT * FROM teams WHERE organization_id = ?", [orgId]);
+    const [rows] = await db.query(
+      `SELECT t.*, COUNT(tm.user_id) AS member_count
+       FROM teams t LEFT JOIN team_members tm ON tm.team_id = t.id
+       WHERE t.organization_id = ?
+       GROUP BY t.id
+       ORDER BY t.name`,
+      [orgId]
+    );
     return rows;
+  }
+
+  static async getMembership(orgId, userId) {
+    const [rows] = await db.query(
+      "SELECT role FROM organization_members WHERE organization_id = ? AND user_id = ? LIMIT 1",
+      [orgId, userId]
+    );
+    return rows[0] || null;
+  }
+
+  static async getTeam(orgId, teamId) {
+    const [rows] = await db.query(
+      "SELECT * FROM teams WHERE id = ? AND organization_id = ? LIMIT 1",
+      [teamId, orgId]
+    );
+    return rows[0] || null;
+  }
+
+  static async listTeamMembers(teamId) {
+    const [rows] = await db.query(
+      `SELECT u.id, u.username, u.display_name, tm.created_at
+       FROM team_members tm INNER JOIN users u ON u.id = tm.user_id
+       WHERE tm.team_id = ? ORDER BY u.username`,
+      [teamId]
+    );
+    return rows;
+  }
+
+  static async addTeamMember(teamId, userId) {
+    await db.query(
+      "INSERT IGNORE INTO team_members (team_id, user_id, created_at) VALUES (?, ?, ?)",
+      [teamId, userId, new Date()]
+    );
+  }
+
+  static async removeTeamMember(teamId, userId) {
+    await db.query("DELETE FROM team_members WHERE team_id = ? AND user_id = ?", [teamId, userId]);
   }
 }
 

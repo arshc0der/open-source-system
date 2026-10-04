@@ -117,6 +117,52 @@ class User {
     );
     return { followers: followers.count, following: following.count };
   }
+
+  static async followerLists(userId) {
+    const [followers, following] = await Promise.all([
+      db.query(
+        `SELECT u.id, u.username, u.display_name, u.avatar_url
+         FROM followers f INNER JOIN users u ON u.id = f.follower_user_id
+         WHERE f.followed_user_id = ? ORDER BY f.created_at DESC`,
+        [userId]
+      ),
+      db.query(
+        `SELECT u.id, u.username, u.display_name, u.avatar_url
+         FROM followers f INNER JOIN users u ON u.id = f.followed_user_id
+         WHERE f.follower_user_id = ? ORDER BY f.created_at DESC`,
+        [userId]
+      ),
+    ]);
+    return { followers: followers[0], following: following[0] };
+  }
+
+  static async contributionActivity(userId, publicOnly = false) {
+    const visibilityFilter = publicOnly ? "AND r.visibility = 'public'" : "";
+    const [rows] = await db.query(
+      `SELECT DATE(c.committed_at) AS day, COUNT(*) AS count
+       FROM commits c
+       INNER JOIN repositories r ON r.id = c.repository_id
+       WHERE c.author_user_id = ? ${visibilityFilter}
+       GROUP BY DATE(c.committed_at)
+       ORDER BY day ASC`,
+      [userId]
+    );
+    return rows;
+  }
+
+  static async isFollowing(followerId, followedId) {
+    if (!followerId || !followedId || followerId === followedId) return false;
+    const [rows] = await db.query(
+      "SELECT 1 FROM followers WHERE follower_user_id = ? AND followed_user_id = ? LIMIT 1",
+      [followerId, followedId]
+    );
+    return rows.length > 0;
+  }
+
+  static async deleteUser(id) {
+    await db.query("DELETE FROM users WHERE id = ?", [id]);
+    return true;
+  }
 }
 
 export default User;

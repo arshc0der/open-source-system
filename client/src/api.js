@@ -43,3 +43,18 @@ export async function api(path, { method = "GET", body } = {}) {
   }
   return data;
 }
+
+export async function apiUpload(path, file) {
+  const headers = {};
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const response = await fetch(path, { method: "PUT", headers, body: file });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(data.message || "upload failed");
+    error.status = response.status;
+    error.payload = data;
+    throw error;
+  }
+  return data;
+}

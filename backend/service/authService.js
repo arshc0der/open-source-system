@@ -11,7 +11,17 @@ const publicUser = (row) => {
   return safe;
 };
 
-export const registerUser = async ({ username, email, password, display_name }) => {
+export const registerUser = async ({
+  username,
+  email,
+  password,
+  display_name,
+  bio,
+  location,
+  company,
+  website_url,
+  avatar_url,
+}) => {
   if (!username || !email || !password) {
     const err = new Error("username, email and password are required");
     err.status = 400;
@@ -38,6 +48,11 @@ export const registerUser = async ({ username, email, password, display_name }) 
     email,
     password_hash,
     display_name: display_name || username,
+    bio,
+    location,
+    company,
+    website_url,
+    avatar_url,
   });
 
   return issueSession(userId);
