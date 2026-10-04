@@ -1,4 +1,5 @@
 const levels = ["bg-[#161b22]", "bg-[#0e4429]", "bg-[#006d32]", "bg-[#26a641]", "bg-[#39d353]"];
+const localDateKey = (date) => [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join("-");
 
 export default function ContributionGraph({ activity = [] }) {
   const counts = new Map(activity.map((entry) => [String(entry.day).slice(0, 10), Number(entry.count)]));
@@ -8,7 +9,7 @@ export default function ContributionGraph({ activity = [] }) {
   start.setDate(start.getDate() - 363 - start.getDay());
   const days = [];
   for (const date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
-    const key = date.toISOString().slice(0, 10);
+    const key = localDateKey(date);
     days.push({ key, count: counts.get(key) || 0 });
   }
   const weeks = [];
